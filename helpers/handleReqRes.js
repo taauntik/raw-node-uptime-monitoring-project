@@ -40,11 +40,11 @@ handler.handleReqRes = (req, res) => {
 
     chosenHandler(requestProperties, (statusCode, payload) => {
         let status = statusCode;
-        let newPayload = payload;
+        let payloadObject = payload;
         status = typeof status === 'number' ? status : 500;
-        newPayload = typeof newPayload === 'object' ? newPayload : {};
+        payloadObject = typeof payloadObject === 'object' ? payloadObject : {};
 
-        const payloadString = JSON.stringify(newPayload);
+        const payloadString = JSON.stringify(payloadObject);
 
         // return the final response
         res.writeHead(status);
