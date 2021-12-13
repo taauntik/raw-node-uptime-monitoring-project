@@ -118,6 +118,7 @@ handler._users.get = (requestProperties, callback) => {
     }
 };
 
+// @TODO Authentication
 handler._users.put = (requestProperties, callback) => {
     const firstName =
         typeof requestProperties.body.firstName === 'string' &&
@@ -189,6 +190,7 @@ handler._users.put = (requestProperties, callback) => {
     }
 };
 
+// @TODO Authentication
 handler._users.delete = (requestProperties, callback) => {
     // check the phone number is valid
     const phone =
