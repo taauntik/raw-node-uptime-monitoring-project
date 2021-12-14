@@ -138,7 +138,6 @@ handler._token.put = (requestProperties, callback) => {
     }
 };
 
-// @TODO Authentication
 handler._token.delete = (requestProperties, callback) => {
     // check the token is valid
     const id =
@@ -173,6 +172,21 @@ handler._token.delete = (requestProperties, callback) => {
             error: 'There was a problem in your request',
         });
     }
+};
+
+handler._token.verify = (id, phone, callback) => {
+    data.read('tokens', id, (err, tokenData) => {
+        if (!err && tokenData) {
+            const tokenObject = parseJSON(tokenData);
+            if (tokenObject.phone === phone && tokenObject.expires > Date.now()) {
+                callback(true);
+            } else {
+                callback(false);
+            }
+        } else {
+            callback(false);
+        }
+    });
 };
 
 module.exports = handler;
