@@ -100,8 +100,8 @@ handler._users.get = (requestProperties, callback) => {
             ? requestProperties.queryStringObject.phone
             : false;
     if (phone) {
-        const headerToken = requestProperties.headersObject.token;
         // verify token
+        const headerToken = requestProperties.headersObject.token;
         const token = typeof headerToken === 'string' ? headerToken : false;
 
         tokenHandler._token.verify(token, phone, (tokenId) => {
@@ -159,35 +159,47 @@ handler._users.put = (requestProperties, callback) => {
 
     if (phone) {
         if (firstName || lastName || password) {
-            // look up the user
-            data.read('users', phone, (err1, user) => {
-                const userData = { ...parseJSON(user) };
-                if (!err1 && userData) {
-                    if (firstName) {
-                        userData.firstName = firstName;
-                    }
-                    if (lastName) {
-                        userData.lastName = lastName;
-                    }
-                    if (password) {
-                        userData.password = hash(password);
-                    }
+            // verify token
+            const headerToken = requestProperties.headersObject.token;
+            const token = typeof headerToken === 'string' ? headerToken : false;
 
-                    // store to database
-                    data.update('users', phone, userData, (err2) => {
-                        if (!err2) {
-                            callback(200, {
-                                message: 'User was updated successfully',
+            tokenHandler._token.verify(token, phone, (tokenId) => {
+                if (tokenId) {
+                    // look up the user
+                    data.read('users', phone, (err1, user) => {
+                        const userData = { ...parseJSON(user) };
+                        if (!err1 && userData) {
+                            if (firstName) {
+                                userData.firstName = firstName;
+                            }
+                            if (lastName) {
+                                userData.lastName = lastName;
+                            }
+                            if (password) {
+                                userData.password = hash(password);
+                            }
+
+                            // store to database
+                            data.update('users', phone, userData, (err2) => {
+                                if (!err2) {
+                                    callback(200, {
+                                        message: 'User was updated successfully',
+                                    });
+                                } else {
+                                    callback(500, {
+                                        error: 'There was a problem in the server side',
+                                    });
+                                }
                             });
                         } else {
-                            callback(500, {
-                                error: 'There was a problem in the server side',
+                            callback(400, {
+                                error: 'You have a problem in your request!',
                             });
                         }
                     });
                 } else {
-                    callback(400, {
-                        error: 'You have a problem in your request!',
+                    callback(403, {
+                        error: 'Authentication failed!',
                     });
                 }
             });
